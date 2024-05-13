@@ -8,6 +8,7 @@ namespace Api.Database.Context
         private static readonly List<Inspection> inspections = GetInspections();
         private static readonly List<Installation> installations = GetInstallations();
         private static readonly List<Robot> robots = GetRobots();
+        private static readonly List<DefaultLocalizationPose> defaultLocalisationPoses = GetDefaultLocalisationPoses();
         private static readonly List<Plant> plants = GetPlants();
         private static readonly List<Deck> decks = GetDecks();
         private static readonly List<Area> areas = GetAreas();
@@ -80,6 +81,24 @@ namespace Api.Database.Context
             });
         }
 
+        private static List<DefaultLocalizationPose> GetDefaultLocalisationPoses()
+        {
+            var defaultLocalisationPose1 = new DefaultLocalizationPose(
+                new Pose(20183.215f,
+                    5246.984f,
+                    14.601f,
+                    0f,
+                    0f,
+                    0.7071f,
+                    0.7071f)
+                );
+
+            return new List<DefaultLocalizationPose>(new[]
+            {
+                defaultLocalisationPose1
+            });
+        }
+
         private static List<Plant> GetPlants()
         {
             var plant1 = new Plant
@@ -93,7 +112,7 @@ namespace Api.Database.Context
             var plant2 = new Plant
             {
                 Id = Guid.NewGuid().ToString(),
-                Installation = installations[0],
+                Installation = installations[1],
                 Name = "Kårstø",
                 PlantCode = "Kårstø"
             };
@@ -151,9 +170,18 @@ namespace Api.Database.Context
                 Name = "Huldra Mezzanine Deck"
             };
 
+            var deckKlab = new Deck
+            {
+                Id = Guid.NewGuid().ToString(),
+                Plant = plants[1],
+                Installation = plants[1].Installation,
+                DefaultLocalizationPose = defaultLocalisationPoses[0],
+                Name = "K-LAB"
+            };
+
             return new List<Deck>(new[]
             {
-                deck1, deck2, deck3, deck4, deckHuldraMezzanine
+                deck1, deck2, deck3, deck4, deckHuldraMezzanine, deckKlab
             });
         }
 
@@ -243,9 +271,21 @@ namespace Api.Database.Context
                 SafePositions = new List<SafePosition>(new[] { new SafePosition() })
             };
 
+            var areaKlab = new Area
+            {
+                Id = Guid.NewGuid().ToString(),
+                Deck = decks[5],
+                Plant = decks[5].Plant,
+                Installation = decks[5].Plant.Installation,
+                Name = "K-LAB",
+                MapMetadata = new MapMetadata(),
+                DefaultLocalizationPose = defaultLocalisationPoses[0],
+                SafePositions = new List<SafePosition>(new[] { new SafePosition() })
+            };
+
             return new List<Area>(new[]
             {
-                area1, area2, area3, area4, area5, area6,areaHuldraHB
+                area1, area2, area3, area4, area5, area6, areaHuldraHB, areaKlab
             });
         }
 
@@ -691,7 +731,7 @@ namespace Api.Database.Context
                     {
                         Type = type,
                         BatteryWarningThreshold = 0f,
-                        LowerPressureWarningThreshold = 0.01f,
+                        LowerPressureWarningThreshold = 0.000f,
                         UpperPressureWarningThreshold = 0.08f
                     };
                 context.Add(model);
@@ -718,6 +758,7 @@ namespace Api.Database.Context
             robots[2].Model = models.Find(model => model.Type == RobotType.AnymalX)!;
 
             context.AddRange(robots);
+            context.AddRange(defaultLocalisationPoses);
             context.AddRange(plants);
             context.AddRange(decks);
             context.AddRange(areas);
