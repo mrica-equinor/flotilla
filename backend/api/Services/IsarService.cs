@@ -25,13 +25,15 @@ namespace Api.Services
 
         public async Task<IsarMission> StartMission(Robot robot, MissionRun missionRun)
         {
+            bool shouldIncludeStartPose = missionRun.IsLocalizationMission();
+            logger.LogInformation("New isar mission includeStartPose is: {includesStartPose}", shouldIncludeStartPose);
             var response = await CallApi(
                 HttpMethod.Post,
                 robot.IsarUri,
                 "schedule/start-mission",
                 new
                 {
-                    mission_definition = new IsarMissionDefinition(missionRun, includeStartPose: missionRun.MissionRunType == MissionRunType.Localization)
+                    mission_definition = new IsarMissionDefinition(missionRun, includeStartPose: shouldIncludeStartPose)
                 }
             );
 
